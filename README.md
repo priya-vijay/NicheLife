@@ -1,5 +1,7 @@
 # NicheLife
-A map visualization tool to find your ideal neighborhoods in Manhattan
+A map visualization tool to find your ideal neighborhoods in Manhattan.
+
+Developed at #DataHack16 by Priyanka Vijay, Jack Hayford, Mihir Prakash, Edward Flores, and Xinli Wang.
 
 ## Python package dependencies:
 pandas, numpy, bokeh (http://bokeh.pydata.org/en/latest/)
@@ -10,10 +12,10 @@ bokeh serve --show main.py
 Colors: 
 
 
-The darker the red, the more satisfied you'll be
+The darker the red, the more satisfied you'll be.
 
-The darker the blue, the cheaper an area is
+The darker the blue, the cheaper an area is.
 
-Dark purple = best bang for your buck
+Dark purple = best bang for your buck.
 
 ![Image of Example](https://github.com/priya-vijay/NicheLife/blob/master/examples/NicheLife_example.png)
