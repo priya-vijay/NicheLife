@@ -9,7 +9,7 @@ from bokeh.models import ColumnDataSource, HBox, VBoxForm, ImageURL
 from bokeh.models.widgets import Slider, TextInput, Select
 from bokeh.io import curdoc
 import pandas as pd
-from bokeh.models import HoverTool
+from bokeh.models import HoverTool, PanTool, BoxZoomTool, WheelZoomTool, ResetTool
 
 # import seaborn as sns
 
@@ -37,6 +37,11 @@ imageurl_wprice = "data/legend_wprice.png"
 
 pricevals = pricevals_real
 imageurl = imageurl_wprice
+
+# yelp data
+yelp = pd.DataFrame.from_csv("data/yelpdata_reformat.csv")
+yelp["BoroCT2010"] = yelp.index
+yelp.index = map(str, yelp["BoroCT2010"])
 
 # print "Number of shapes:", len(shapes)
 
@@ -68,8 +73,8 @@ def mapcolors(qivallist, pricevallist):
     # split qivallist into 3 categories
     qi_split1 = np.percentile(qivallist, 33)
     qi_split2 = np.percentile(qivallist, 66)
-    print qi_split1, qi_split2
-    print type(qi_split1)
+    # print qi_split1, qi_split2
+    # print type(qi_split1)
     qi_colorcodes = []
     for qi in qivallist:
         # qi = qiv.values[0]
@@ -94,39 +99,53 @@ def mapcolors(qivallist, pricevallist):
     return colorlist
 
 
+# def getscore(userinputs):  # user inputs: list of feature importance values
+#     keepfeatures = recdf[["Distance", "Crime_Ct", "Complaints"]].applymap(float) + 1
+#     logfeatures = keepfeatures.applymap(np.log)
+#     zscores = logfeatures.apply(lambda x: (x - np.mean(x)) / np.std(x))
+#     compscore = zscores.apply(lambda x: -userinputs[0] * x["Distance"] - userinputs[1] * x["Crime_Ct"] - userinputs[2] * x["Complaints"], axis=1)
+#     return compscore
+
+# get score with yelp
 def getscore(userinputs):  # user inputs: list of feature importance values
-    keepfeatures = recdf[["Distance", "Crime_Ct", "Complaints"]].applymap(float) + 1
+    merged = pd.concat([yelp, recdf], axis=1)
+    keepfeatures = merged[["Distance", "Crime_Ct", "Complaints", "restaurants"]].applymap(float) + 1
     logfeatures = keepfeatures.applymap(np.log)
     zscores = logfeatures.apply(lambda x: (x - np.mean(x)) / np.std(x))
-    compscore = zscores.apply(lambda x: -userinputs[0] * x["Distance"] - userinputs[1] * x["Crime_Ct"] - userinputs[2] * x["Complaints"], axis=1)
+    # compscore = zscores.apply(lambda x: -userinputs[0] * x["Distance"] - userinputs[1] * x["Crime_Ct"] - userinputs[2] * x["Complaints"] + userinputs[2] * x["Complaints"], axis=1)
+    multiplier = [-1, -1, -1, 1]
+    newuservector = [userinputs[i]*multiplier[i] for i in range(len(userinputs))]
+    compscore = zscores.dot(newuservector)
+    compzscore = (compscore - np.mean(compscore))/np.std(compscore)
     return compscore
 
 
-qivals = getscore([0.5, 0.5, 0.5])
-print qivals
+qivals = getscore([0.5, 0.5, 0.5, 0.5])
+# print qivals
 # outfile = open("test_qivals.txt", "w")
 # for item in qivals:
 #     outfile.write(item+"\n")
 # outfile.close()
-# print qivals
-print len(qivals)
-print type(qivals)
+# # print qivals
+# print len(qivals)
+# print type(qivals)
 
 
 ct_colors = mapcolors(qivals, pricevals)
 
 # output_file("nyc_basemap.html", title="NYC census tracts")
-source = ColumnDataSource(data=dict(QI_colmap=ct_colors, ct_x=ct_x, ct_y=ct_y, NicheI=qivals, Price=pricevals))
+source = ColumnDataSource(data=dict(QI_colmap=ct_colors, ct_x=ct_x, ct_y=ct_y, NicheScore=qivals, Price=pricevals, Neighborhood=extrainfo["NTAName"])) #.loc[recdf.index]
 # print source
 hover = HoverTool(
         tooltips=[
-            ("index", "$index"),
-            ("Niche Score", "@NicheI"),
+            ("Niche Score", "@NicheScore"),
             ("Price", "@Price"),
         ]
-    )
+    ) #("Area", "@Neighborhood"),
 
-p = Figure(title="NicheLife Map", plot_width=800, plot_height=700, tools=[hover])
+tools = [PanTool(), BoxZoomTool(), WheelZoomTool(), ResetTool(), hover]
+
+p = Figure(title="NicheLife Map", plot_width=800, plot_height=700, tools=tools)
            # tools="pan,wheel_zoom,reset,box_zoom,save")  # toolbar_location="top", #box_select,
 p.grid.grid_line_alpha = 0
 
@@ -142,7 +161,9 @@ text = TextInput(title="Map Name", value="NicheLife Map")
 feature1 = Slider(title="Subway Accessibility", value=0.5, start=0, end=1, step=.1)
 feature2 = Slider(title="Safety", value=0.5, start=0, end=1, step=.1)
 feature3 = Slider(title="Public Satisfaction", value=0.5, start=0, end=1, step=.1)
+feature4 = Slider(title="Restaurants", value=0.5, start=0, end=1, step=.1)
 price = Select(title="Show Affordability", options=["Yes", "No"])
+
 
 # Set up callbacks
 def update_title(attrname, old, new):
@@ -157,10 +178,11 @@ def update_data(attrname, old, new):
     f1user = feature1.value
     f2user = feature2.value
     f3user = feature3.value
+    f4user = feature4.value
     showprice = price.value
 
     # Calculate score based on user input
-    qivals = getscore([f1user, f2user, f3user])
+    qivals = getscore([f1user, f2user, f3user, f4user])
 
     # Calcualte color palette based on whether showing price or not
     if showprice == "Yes":
@@ -173,15 +195,15 @@ def update_data(attrname, old, new):
 
     # p.title = "hi"
 
-    source.data = dict(QI_colmap=ct_colors, ct_x=ct_x, ct_y=ct_y, NicheI=qivals, Price=pricevals)
+    source.data = dict(QI_colmap=ct_colors, ct_x=ct_x, ct_y=ct_y, NicheScore=qivals, Price=pricevals, Neighborhood=extrainfo["NTAName"])
     # source.data = pd.DataFrame([ct_colors, ct_x, ct_y], columns=["QI_colmap", "ct_x", "ct_y"])
 
-for w in [feature1, feature2, feature3, price]:
+for w in [feature1, feature2, feature3, feature4, price]:
     w.on_change('value', update_data)
 
 
 # Set up layouts and add to document
-inputs = VBoxForm(children=[text, feature1, feature2, feature3, price])
+inputs = VBoxForm(children=[text, feature1, feature2, feature3, feature4, price])
 # inputs = VBoxForm(children=[feature1, feature2, feature3])
 # inputs = VBoxForm(children=[text])
 curdoc().add_root(HBox(children=[p, inputs]))  # , width=800
