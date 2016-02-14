@@ -109,18 +109,18 @@ def mapcolors(qivallist, pricevallist):
 # get score with yelp
 def getscore(userinputs):  # user inputs: list of feature importance values
     merged = pd.concat([yelp, recdf], axis=1)
-    keepfeatures = merged[["Distance", "Crime_Ct", "Complaints", "restaurants"]].applymap(float) + 1
+    keepfeatures = merged[["Distance", "Crime_Ct", "Complaints", "restaurants", "food", "nightlife"]].applymap(float) + 1
     logfeatures = keepfeatures.applymap(np.log)
     zscores = logfeatures.apply(lambda x: (x - np.mean(x)) / np.std(x))
     # compscore = zscores.apply(lambda x: -userinputs[0] * x["Distance"] - userinputs[1] * x["Crime_Ct"] - userinputs[2] * x["Complaints"] + userinputs[2] * x["Complaints"], axis=1)
-    multiplier = [-1, -1, -1, 1]
+    multiplier = [-1, -1, -1, 1, 1, 1]
     newuservector = [userinputs[i]*multiplier[i] for i in range(len(userinputs))]
     compscore = zscores.dot(newuservector)
     compzscore = (compscore - np.mean(compscore))/np.std(compscore)
     return compscore
 
 
-qivals = getscore([0.5, 0.5, 0.5, 0.5])
+qivals = getscore([0.5, 0.5, 0.5, 0.5, 0.5, 0.5])
 # print qivals
 # outfile = open("test_qivals.txt", "w")
 # for item in qivals:
@@ -162,6 +162,8 @@ feature1 = Slider(title="Subway Accessibility", value=0.5, start=0, end=1, step=
 feature2 = Slider(title="Safety", value=0.5, start=0, end=1, step=.1)
 feature3 = Slider(title="Public Satisfaction", value=0.5, start=0, end=1, step=.1)
 feature4 = Slider(title="Restaurants", value=0.5, start=0, end=1, step=.1)
+feature5 = Slider(title="Grocery Stores", value=0.5, start=0, end=1, step=.1)
+feature6 = Slider(title="Nightlife", value=0.5, start=0, end=1, step=.1)
 price = Select(title="Show Affordability", options=["Yes", "No"])
 
 
@@ -179,10 +181,12 @@ def update_data(attrname, old, new):
     f2user = feature2.value
     f3user = feature3.value
     f4user = feature4.value
+    f5user = feature5.value
+    f6user = feature6.value
     showprice = price.value
 
     # Calculate score based on user input
-    qivals = getscore([f1user, f2user, f3user, f4user])
+    qivals = getscore([f1user, f2user, f3user, f4user, f5user, f6user])
 
     # Calcualte color palette based on whether showing price or not
     if showprice == "Yes":
@@ -198,12 +202,12 @@ def update_data(attrname, old, new):
     source.data = dict(QI_colmap=ct_colors, ct_x=ct_x, ct_y=ct_y, NicheScore=qivals, Price=pricevals, Neighborhood=extrainfo["NTAName"])
     # source.data = pd.DataFrame([ct_colors, ct_x, ct_y], columns=["QI_colmap", "ct_x", "ct_y"])
 
-for w in [feature1, feature2, feature3, feature4, price]:
+for w in [feature1, feature2, feature3, feature4, feature5, feature6, price]:
     w.on_change('value', update_data)
 
 
 # Set up layouts and add to document
-inputs = VBoxForm(children=[text, feature1, feature2, feature3, feature4, price])
+inputs = VBoxForm(children=[text, feature1, feature2, feature3, feature4, feature5, feature6, price])
 # inputs = VBoxForm(children=[feature1, feature2, feature3])
 # inputs = VBoxForm(children=[text])
 curdoc().add_root(HBox(children=[p, inputs]))  # , width=800
