@@ -9,7 +9,7 @@ from bokeh.models import ColumnDataSource, HBox, VBoxForm, ImageURL
 from bokeh.models.widgets import Slider, TextInput, Select
 from bokeh.io import curdoc
 import pandas as pd
-from bokeh.models import HoverTool, PanTool, BoxZoomTool, WheelZoomTool, ResetTool
+from bokeh.models import HoverTool, PanTool, BoxZoomTool, WheelZoomTool, ResetTool, PreviewSaveTool
 
 # import seaborn as sns
 
@@ -143,7 +143,7 @@ hover = HoverTool(
         ]
     ) #("Area", "@Neighborhood"),
 
-tools = [PanTool(), BoxZoomTool(), WheelZoomTool(), ResetTool(), hover]
+tools = [PanTool(), BoxZoomTool(), WheelZoomTool(), ResetTool(), hover, PreviewSaveTool()]
 
 p = Figure(title="NicheLife Map", plot_width=800, plot_height=700, tools=tools)
            # tools="pan,wheel_zoom,reset,box_zoom,save")  # toolbar_location="top", #box_select,
