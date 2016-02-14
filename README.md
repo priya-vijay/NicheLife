@@ -1,7 +1,7 @@
 # NicheLife
 A map visualization tool to find your ideal neighborhoods in Manhattan.
 
-Developed at #DataHack16 by Priyanka Vijay, Jack Hayford, Mihir Prakash, Edward Flores, and Xinli Wang.
+Developed at Cornell Data Science Hackathon (#DataHack16) by Priyanka Vijay, Jack Hayford, Mihir Prakash, Edward Flores, and Xinli Wang.
 
 ## Python package dependencies:
 pandas, numpy, bokeh (http://bokeh.pydata.org/en/latest/)
