@@ -9,13 +9,28 @@ pandas, numpy, pyshp, bokeh
 ## To run locally:
 bokeh serve --show main.py
 
+
 Colors: 
 
+The darker the red, the closer the area matches your preferences.
+The darker the blue, the cheaper an area is (price per square foot).
+Dark purple shows the most affordable areas that also match your preferences.
 
-The darker the red, the more satisfied you'll be.
 
-The darker the blue, the cheaper an area is.
-
-Dark purple = best bang for your buck.
-
+### Example 1. My ideal place has good access to subways, is reasonably safe, and is close to grocery stores and bars.
 ![Image of Example](https://github.com/priya-vijay/NicheLife/blob/master/examples/NicheLife_example.png)
+
+### Example 2. I'm just curious about where people are the most satisfied, i.e., submitted the least complaints to http://www1.nyc.gov/311
+![Image of Example](https://github.com/priya-vijay/NicheLife/blob/master/examples/Only_satisfaction.png)
+
+### Example 3. What parts of Manhattan have the best access to grocery stores and restaurants?
+
+(Data from yelp)
+
+Can immediately visualize potential food deserts in a city.
+![Image of Example](https://github.com/priya-vijay/NicheLife/blob/master/examples/Only_food.png)
+
+### Example 4. What are the cheapest parts of the city that are also close to subways?
+
+Can also zoom in and out and hover over blocks to learn more information.
+![Image of Example](https://github.com/priya-vijay/NicheLife/blob/master/examples/Subway_and_Price_zoom.png)

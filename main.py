@@ -74,25 +74,31 @@ def mapcolors(qivallist, pricevallist):
     # print qi_split1, qi_split2
     # print type(qi_split1)
     qi_colorcodes = []
-    for qi in qivallist:
-        # qi = qiv.values[0]
-        if qi < qi_split1:
-            qi_colorcodes.append("0")
-        elif qi < qi_split2:
-            qi_colorcodes.append("1")
-        else:
-            qi_colorcodes.append("2")
+    if qi_split1 == qi_split2:
+        qi_colorcodes = ["0"]*len(qivallist)
+    else:
+        for qi in qivallist:
+            # qi = qiv.values[0]
+            if qi < qi_split1:
+                qi_colorcodes.append("0")
+            elif qi < qi_split2:
+                qi_colorcodes.append("1")
+            else:
+                qi_colorcodes.append("2")
     # split pricevallist into 3 categories
     price_split1 = np.percentile(pricevallist, 33)
     price_split2 = np.percentile(pricevallist, 66)
     price_colorcodes = []
-    for price in pricevallist:
-        if price < price_split1:
-            price_colorcodes.append("2")
-        elif price < price_split2:
-            price_colorcodes.append("1")
-        else:
-            price_colorcodes.append("0")
+    if price_split1 == price_split2:
+        price_colorcodes = ["0"]*len(pricevallist)
+    else:
+        for price in pricevallist:
+            if price < price_split1:
+                price_colorcodes.append("2")
+            elif price < price_split2:
+                price_colorcodes.append("1")
+            else:
+                price_colorcodes.append("0")
     colorlist = [colorsdict[qi_colorcodes[x] + price_colorcodes[x]] for x in range(len(qi_colorcodes))]
     return colorlist
 
