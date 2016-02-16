@@ -4,7 +4,7 @@ A map visualization tool to find your ideal neighborhoods in Manhattan.
 Developed at Cornell Data Science Hackathon (#DataHack16) by Priyanka Vijay, Jack Hayford, Mihir Prakash, Edward Flores, and Xinli Wang.
 
 ## Python package dependencies:
-pandas, numpy, bokeh (http://bokeh.pydata.org/en/latest/)
+pandas, numpy, pyshp, bokeh
 
 ## To run locally:
 bokeh serve --show main.py

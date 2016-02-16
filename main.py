@@ -10,16 +10,14 @@ from bokeh.models.widgets import Slider, TextInput, Select
 from bokeh.io import curdoc
 import pandas as pd
 from bokeh.models import HoverTool, PanTool, BoxZoomTool, WheelZoomTool, ResetTool, PreviewSaveTool
+import shapefile
 
-# import seaborn as sns
-
-pyshp = imp.load_source('pyshp', 'third_party/shapefile.py')
 
 # plot basemap
 baseshapefile = "data/shapefile/FinalManhattan_CT_New_Crime_Dist_Complaints_NewProjection"  # should be 288
 
 
-sf = pyshp.Reader(baseshapefile)
+sf = shapefile.Reader(baseshapefile)
 shapes = sf.shapes()
 records = sf.records()
 recdf = pd.DataFrame(records)
